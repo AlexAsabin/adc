@@ -5,6 +5,6 @@ using adc.Entities;
 namespace adc.Dal {
     public class AdcDbContext : DbContext {
         public AdcDbContext(DbContextOptions<AdcDbContext> options) : base(options) { }
-        public virtual DbSet<Conversions> Conversions { get; set; }
+        public virtual DbSet<Conversion> Conversions { get; set; }
     }
 }

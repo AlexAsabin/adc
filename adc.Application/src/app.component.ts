@@ -18,6 +18,6 @@ export class AppComponent implements OnInit{
 
   getData(): void {
     this.appService.getData()
-      .subscribe(data => this.data = data.value as string);
+      .subscribe(data => this.data = data.name as string);
   }  
 }

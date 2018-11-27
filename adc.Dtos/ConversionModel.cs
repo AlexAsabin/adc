@@ -1,8 +1,10 @@
 ﻿using adc.Core.Interfaces;
 
-namespace adc.Entities {
-    public class Conversions : IId<long>, IEntity {
+namespace adc.Dtos {
+    public class ConversionModel : IId<long>, IDto {
+
         public long Id { get; set; }
         public string Name { get; set; }
+
     }
 }

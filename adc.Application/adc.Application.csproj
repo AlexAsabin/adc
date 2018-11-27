@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\adc.Dal\adc.Dal.csproj" />
+    <ProjectReference Include="..\adc.Services\adc.Services.csproj" />
   </ItemGroup>
 
 </Project>
