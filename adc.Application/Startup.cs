@@ -1,11 +1,14 @@
-using adc.Dal;
-using adc.Services;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
+
+using adc.Dal;
+using adc.Services;
+using adc.Entities.Security;
 
 namespace adc.Application {
     public class Startup {
@@ -20,8 +23,31 @@ namespace adc.Application {
 
         public void ConfigureServices(IServiceCollection services) {
             services.AddDbContext<AdcDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ADC")));
+
             services.AddAdcServices();
+
+            services.AddIdentity<User, Role>(options => {
+                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            }).AddEntityFrameworkStores<AdcDbContext>();
+
             services.AddDbRepositories();
+
+            services.AddAuthorization().AddAuthentication().AddCookie();
+
+            services.ConfigureApplicationCookie(options => {
+                options.Events.OnRedirectToAccessDenied = context => {
+                    context.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToLogin = context => {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+            });
+
             services.AddMvc();
         }
 
@@ -37,9 +63,17 @@ namespace adc.Application {
                     await next();
                 }
             });
-            app.UseMvcWithDefaultRoute();
-            app.UseDefaultFiles();
+
+            app.UseAuthentication();
+
+            DefaultFilesOptions options = new DefaultFilesOptions();
+            options.DefaultFileNames.Clear();
+            options.DefaultFileNames.Add("index.html");
+            app.UseDefaultFiles(options);
+
             app.UseStaticFiles();
+
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
